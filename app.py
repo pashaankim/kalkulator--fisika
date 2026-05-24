@@ -9,8 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import re
 
-app = Flask(__name__)
-
 # ==================== DATA FISIKA ====================
 CONSTANTS = {
     'g': {'value': 9.8, 'unit': 'm/s²', 'name': 'Percepatan gravitasi bumi'},
