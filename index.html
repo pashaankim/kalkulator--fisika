@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Physics Calculator</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-hover: #f1f5f9;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .theme-toggle {
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius);
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+            background: white;
+            color: #333;
+        }
+
+        .search-box input:focus {
+            outline: 2px solid var(--accent);
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .tag-mekanika { background: #dbeafe; color: #1d4ed8; }
+        .tag-listrik { background: #fef3c7; color: #92400e; }
+        .tag-gelombang { background: #d1fae5; color: #065f46; }
+        .tag-fluida { background: #fce7f3; color: #9d174d; }
+        .tag-termo { background: #e0e7ff; color: #3730a3; }
+
+        [data-theme="dark"] .tag-mekanika { background: #1e3a5f; color: #93bbfc; }
+        [data-theme="dark"] .tag-listrik { background: #451a03; color: #fcd34d; }
+        [data-theme="dark"] .tag-gelombang { background: #064e3b; color: #6ee7b7; }
+        [data-theme="dark"] .tag-fluida { background: #500724; color: #f9a8d4; }
+        [data-theme="dark"] .tag-termo { background: #1e1b4b; color: #a5b4fc; }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Results */
+        .result-box {
+            background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+            border: 1px solid #93c5fd;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        [data-theme="dark"] .result-box {
+            background: linear-gradient(135deg, #1e3a5f, #312e81);
+            border-color: #4f46e5;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .steps-list {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .steps-list ol {
+            padding-left: 1.5rem;
+        }
+
+        .steps-list li {
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        /* Calculator Layout */
+        .calc-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .calc-layout { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .mobile-menu { display: block; }
+        }
+
+        /* Formula Library */
+        .formula-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .formula-math {
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            background: var(--bg-hover);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Converter */
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .swap-btn {
+            padding: 0.75rem;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Graph */
+        .graph-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .graph-img {
+            max-width: 100%;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow);
+        }
+
+        /* Quiz */
+        .quiz-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+        .quiz-option {
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-card);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: var(--bg-hover);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: #d1fae5;
+        }
+
+        .quiz-option.wrong {
+            border-color: var(--danger);
+            background: #fee2e2;
+        }
+
+        /* Scientific Calculator */
+        .sci-calc {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+
+        .calc-display {
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            font-size: 1.5rem;
+            text-align: right;
+            margin-bottom: 1rem;
+            min-height: 3rem;
+            word-break: break-all;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calc-btn {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            color: var(--text);
+        }
+
+        .calc-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .calc-btn.span-2 {
+            grid-column: span 2;
+        }
+
+        /* Virtual Lab Canvas */
+        .lab-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+
+        .lab-canvas {
+            width: 100%;
+            height: 400px;
+            background: var(--bg-hover);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .lab-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Cheat Sheet */
+        .cheat-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+
+        .cheat-table th, .cheat-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        .cheat-table th {
+            background: var(--primary);
+            color: white;
+        }
+
+        .cheat-table tr:nth-child(even) {
+            background: var(--bg-hover);
+        }
+
+        /* AI Assistant */
+        .chat-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .chat-response {
+            background: var(--bg-hover);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .chip {
+            padding: 0.5rem 1rem;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .chip:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Utility */
+        .text-center { text-align: center; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .hidden { display: none; }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+
+        [data-theme="dark"] .badge-green { background: #064e3b; color: #6ee7b7; }
+        [data-theme="dark"] .badge-yellow { background: #451a03; color: #fcd34d; }
+        [data-theme="dark"] .badge-red { background: #450a0a; color: #fca5a5; }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 99;
+        }
+
+        .mobile-menu-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mobile-nav {
+            position: fixed;
+            bottom: 80px;
+            right: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 200px;
+        }
+
+        .mobile-nav.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">⚛️ Smart Physics</div>
+            <div class="nav-links">
+                <button class="nav-btn active" onclick="showSection('home')">🏠 Beranda</button>
+                <button class="nav-btn" onclick="showSection('calculator')">🧮 Kalkulator</button>
+                <button class="nav-btn" onclick="showSection('formulas')">📚 Rumus</button>
+                <button class="nav-btn" onclick="showSection('converter')">🔄 Konverter</button>
+                <button class="nav-btn" onclick="showSection('graph')">📊 Grafik</button>
+                <button class="nav-btn" onclick="showSection('ai')">🤖 AI Asisten</button>
+                <button class="nav-btn" onclick="showSection('lab')">🔬 Lab Virtual</button>
+                <button class="nav-btn" onclick="showSection('practice')">📝 Latihan</button>
+                <button class="nav-btn" onclick="showSection('scientific')">🔢 Scientific</button>
+                <button class="nav-btn" onclick="showSection('cheatsheet')">📋 Ringkasan</button>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <div class="mobile-nav" id="mobileNav">
+            <button class="nav-btn" onclick="showSection('home'); toggleMobile()">🏠 Beranda</button>
+            <button class="nav-btn" onclick="showSection('calculator'); toggleMobile()">🧮 Kalkulator</button>
+            <button class="nav-btn" onclick="showSection('formulas'); toggleMobile()">📚 Rumus</button>
+            <button class="nav-btn" onclick="showSection('converter'); toggleMobile()">🔄 Konverter</button>
+            <button class="nav-btn" onclick="showSection('graph'); toggleMobile()">📊 Grafik</button>
+            <button class="nav-btn" onclick="showSection('ai'); toggleMobile()">🤖 AI</button>
+            <button class="nav-btn" onclick="showSection('lab'); toggleMobile()">🔬 Lab</button>
+            <button class="nav-btn" onclick="showSection('practice'); toggleMobile()">📝 Latihan</button>
+            <button class="nav-btn" onclick="showSection('scientific'); toggleMobile()">🔢 Calc</button>
+            <button class="nav-btn" onclick="showSection('cheatsheet'); toggleMobile()">📋 Ringkasan</button>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMobile()">☰</button>
+    </div>
+
+    <div class="container">
+
+        <!-- HOME SECTION -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <h1>⚛️ Smart Physics Calculator</h1>
+                <p>Kalkulator fisika cerdas dengan penjelasan langkah demi langkah, grafik interaktif, simulasi virtual, dan latihan soal.</p>
+                <div class="search-box">
+                    <input type="text" id="globalSearch" placeholder="Cari rumus, konsep, atau besaran fisika..." onkeyup="searchGlobal(this.value)">
+                </div>
+            </div>
+
+            <h2 class="text-center mb-3">⚡ Menu Cepat</h2>
+            <div class="cards-grid" id="quickMenu">
+                <div class="card" onclick="showSection('calculator'); selectFormula('newton')">
+                    <div class="card-icon">🍎</div>
+                    <h3>Hukum Newton</h3>
+                    <p>Kalkulator gaya, massa, dan percepatan</p>
+                    <span class="card-tag tag-mekanika">Mekanika</span>
+                </div>
+                <div class="card" onclick="showSection('calculator'); selectFormula('kinetic_energy')">
+                    <div class="card-icon">⚡</div>
+                    <h3>Energi & Usaha</h3>
+                    <p>Kinetik, potensial, usaha, dan daya</p>
+                    <span class="card-tag tag-mekanika">Mekanika</span>
+                </div>
+                <div class="card" onclick="showSection('calculator'); selectFormula('ohm')">
+                    <div class="card-icon">⚡</div>
+                    <h3>Listrik & Magnet</h3>
+                    <p>Hukum Ohm, daya, hambatan</p>
+                    <span class="card-tag tag-listrik">Listrik</span>
+                </div>
+                <div class="card" onclick="showSection('calculator'); selectFormula('wave_speed')">
+                    <div class="card-icon">〰️</div>
+                    <h3>Gelombang</h3>
+                    <p>Frekuensi, periode, cepat rambat</p>
+                    <span class="card-tag tag-gelombang">Gelombang</span>
+                </div>
+                <div class="card" onclick="showSection('calculator'); selectFormula('pressure')">
+                    <div class="card-icon">💧</div>
+                    <h3>Fluida</h3>
+                    <p>Tekanan, Archimedes, debit</p>
+                    <span class="card-tag tag-fluida">Fluida</span>
+                </div>
+                <div class="card" onclick="showSection('converter')">
+                    <div class="card-icon">🔄</div>
+                    <h3>Konverter Satuan</h3>
+                    <p>Konversi otomatis antar satuan SI</p>
+                    <span class="card-tag tag-termo">Alat</span>
+                </div>
+                <div class="card" onclick="showSection('graph')">
+                    <div class="card-icon">📈</div>
+                    <h3>Grafik Interaktif</h3>
+                    <p>Visualisasi gelombang dan gerak</p>
+                    <span class="card-tag tag-gelombang">Visual</span>
+                </div>
+                <div class="card" onclick="showSection('practice')">
+                    <div class="card-icon">📝</div>
+                    <h3>Latihan Soal</h3>
+                    <p>Soal pilihan ganda dengan pembahasan</p>
+                    <span class="card-tag tag-mekanika">Latihan</span>
+                </div>
+            </div>
+
+            <div class="text-center mt-2">
+                <h3>🎯 Kenapa Smart Physics?</h3>
+                <div class="cards-grid" style="margin-top: 1.5rem;">
+                    <div class="card">
+                        <h3>🧠 Pintar</h3>
+                        <p>Langkah pengerjaan otomatis dengan penjelasan detail</p>
+                    </div>
+                    <div class="card">
+                        <h3>📊 Visual</h3>
+                        <p>Grafik dan simulasi untuk pemahaman lebih baik</p>
+                    </div>
+                    <div class="card">
+                        <h3>🔄 Lengkap</h3>
+                        <p>18+ rumus fisika dari mekanika hingga termodinamika</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALCULATOR SECTION -->
+        <section id="calculator" class="section">
+            <h1 class="section-title">🧮 Smart Calculator</h1>
+            <p class="section-subtitle">Pilih rumus fisika, masukkan nilai yang diketahui, dan dapatkan hasil dengan langkah pengerjaan lengkap.</p>
+            
+            <div class="calc-layout">
+                <div>
+                    <div class="form-group">
+                        <label>Pilih Rumus Fisika</label>
+                        <select id="calcFormula" onchange="updateCalcForm()">
+                            <option value="">-- Pilih Rumus --</option>
+                            <optgroup label="Mekanika">
+                                <option value="newton">Hukum Newton II (F = ma)</option>
+                                <option value="kinetic_energy">Energi Kinetik (Ek = ½mv²)</option>
+                                <option value="potential_energy">Energi Potensial (Ep = mgh)</option>
+                                <option value="work">Usaha (W = Fs)</option>
+                                <option value="momentum">Momentum (p = mv)</option>
+                                <option value="impulse">Impuls (I = FΔt)</option>
+                            </optgroup>
+                            <optgroup label="Listrik">
+                                <option value="ohm">Hukum Ohm (V = IR)</option>
+                                <option value="electric_power">Daya Listrik (P = VI)</option>
+                                <option value="resistance_series">Hambatan Seri</option>
+                                <option value="resistance_parallel">Hambatan Paralel</option>
+                            </optgroup>
+                            <optgroup label="Gelombang">
+                                <option value="frequency">Frekuensi (f = 1/T)</option>
+                                <option value="wave_speed">Cepat Rambat (v = fλ)</option>
+                            </optgroup>
+                            <optgroup label="Fluida & Termo">
+                                <option value="pressure">Tekanan (P = F/A)</option>
+                                <option value="archimedes">Hukum Archimedes</option>
+                                <option value="flow_rate">Debit (Q = V/t)</option>
+                                <option value="density">Massa Jenis (ρ = m/V)</option>
+                                <option value="ideal_gas">Persamaan Gas Ideal (PV = nRT)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <div id="calcInputs"></div>
+                    
+                    <button class="btn btn-primary" onclick="calculate()" style="width: 100%; margin-top: 1rem;">
+                        🔢 Hitung & Jelaskan
+                    </button>
+                </div>
+                
+                <div id="calcResult"></div>
+            </div>
+        </section>
+
+        <!-- FORMULA LIBRARY -->
+        <section id="formulas" class="section">
+            <h1 class="section-title">📚 Formula Library</h1>
+            <p class="section-subtitle">Koleksi lengkap rumus fisika dengan penjelasan variabel dan satuan SI.</p>
+            
+            <div class="form-group">
+                <input type="text" id="formulaSearch" placeholder="🔍 Cari rumus..." onkeyup="searchFormulas(this.value)">
+            </div>
+            
+            <div id="formulaList"></div>
+        </section>
+
+        <!-- CONVERTER -->
+        <section id="converter" class="section">
+            <h1 class="section-title">🔄 Auto Unit Converter</h1>
+            <p class="section-subtitle">Konversi satuan otomatis dengan notasi ilmiah.</p>
+            
+            <div class="form-group">
+                <label>Kategori Konversi</label>
+                <select id="convCategory" onchange="updateConvUnits()">
+                    <option value="length">📏 Panjang</option>
+                    <option value="mass">⚖️ Massa</option>
+                    <option value="time">⏱️ Waktu</option>
+                    <option value="temperature">🌡️ Suhu</option>
+                    <option value="energy">⚡ Energi</option>
+                    <option value="force">💪 Gaya</option>
+                    <option value="velocity">🏃 Kecepatan</option>
+                    <option value="pressure">💨 Tekanan</option>
+                    <option value="power">🔌 Daya</option>
+                </select>
+            </div>
+            
+            <div class="converter-grid">
+                <div class="form-group">
+                    <label>Nilai</label>
+                    <input type="number" id="convValue" value="1" step="any">
+                </div>
+                <div class="form-group">
+                    <label>Dari</label>
+                    <select id="convFrom"></select>
+                </div>
+                <button class="swap-btn" onclick="swapConv()">⇄</button>
+                <div class="form-group">
+                    <label>Ke</label>
+                    <select id="convTo"></select>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary mt-2" onclick="convert()" style="width: 100%;">
+                🔄 Konversi
+            </button>
+            
+            <div id="convResult" class="mt-2"></div>
+        </section>
+
+        <!-- GRAPH SECTION -->
+        <section id="graph" class="section">
+            <h1 class="section-title">📊 Interactive Graph</h1>
+            <p class="section-subtitle">Visualisasi grafik fisika dengan parameter yang dapat diatur.</p>
+            
+            <div class="form-group">
+                <label>Jenis Grafik</label>
+                <select id="graphType" onchange="updateGraphForm()">
+                    <option value="wave">〰️ Gelombang Sinus</option>
+                    <option value="free_fall">🍎 Jatuh Bebas</option>
+                    <option value="glbb">📈 GLBB (Kecepatan vs Waktu)</option>
+                    <option value="position_time">📍 Posisi vs Waktu (GLB)</option>
+                    <option value="spring">🌀 Osilasi Pegas</option>
+                </select>
+            </div>
+            
+            <div id="graphInputs"></div>
+            
+            <button class="btn btn-primary mt-2" onclick="generateGraph()" style="width: 100%;">
+                📊 Generate Grafik
+            </button>
+            
+            <div id="graphResult" class="graph-container mt-2" style="display: none;">
+                <img id="graphImage" class="graph-img" alt="Grafik Fisika">
+            </div>
+        </section>
+
+        <!-- AI ASSISTANT -->
+        <section id="ai" class="section">
+            <h1 class="section-title">🤖 AI Physics Assistant</h1>
+            <p class="section-subtitle">Asisten pintar untuk menghitung dan menjelaskan soal fisika secara otomatis.</p>
+            
+            <div class="chat-container">
+                <div class="chat-input">
+                    <input type="text" id="aiQuery" placeholder="Contoh: Hitung energi kinetik benda 2 kg dengan kecepatan 10 m/s" onkeypress="if(event.key==='Enter')askAI()">
+                    <button class="btn btn-primary" onclick="askAI()">Kirim</button>
+                </div>
+                
+                <div class="suggestion-chips">
+                    <span class="chip" onclick="setAIQuery('Hitung energi kinetik benda 2 kg dengan kecepatan 10 m/s')">Energi Kinetik</span>
+                    <span class="chip" onclick="setAIQuery('Hitung gaya benda 5 kg dengan percepatan 2 m/s²')">Hukum Newton</span>
+                    <span class="chip" onclick="setAIQuery('Hitung tegangan arus 2 A dengan hambatan 10 ohm')">Hukum Ohm</span>
+                    <span class="chip" onclick="setAIQuery('Hitung energi potensial benda 3 kg pada ketinggian 10 m')">Energi Potensial</span>
+                </div>
+                
+                <div id="aiResponse"></div>
+            </div>
+        </section>
+
+        <!-- VIRTUAL LAB -->
+        <section id="lab" class="section">
+            <h1 class="section-title">🔬 Virtual Physics Lab</h1>
+            <p class="section-subtitle">Simulasi fisika real-time dengan kontrol interaktif.</p>
+            
+            <div class="lab-container">
+                <div style="margin-bottom: 1rem;">
+                    <button class="btn btn-secondary" onclick="setLabMode('freefall')">🍎 Jatuh Bebas</button>
+                    <button class="btn btn-secondary" onclick="setLabMode('wave')">〰️ Gelombang</button>
+                    <button class="btn btn-secondary" onclick="setLabMode('spring')">🌀 Pegas</button>
+                </div>
+                
+                <canvas id="labCanvas" class="lab-canvas"></canvas>
+                
+                <div class="lab-controls" id="labControls">
+                    <!-- Dynamic controls -->
+                </div>
+                
+                <div class="mt-2">
+                    <button class="btn btn-success" onclick="startSimulation()">▶️ Mulai</button>
+                    <button class="btn btn-danger" onclick="stopSimulation()">⏹️ Berhenti</button>
+                    <button class="btn btn-secondary" onclick="resetSimulation()">🔄 Reset</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRACTICE -->
+        <section id="practice" class="section">
+            <h1 class="section-title">📝 Practice Questions</h1>
+            <p class="section-subtitle">Latihan soal pilihan ganda dengan pembahasan otomatis.</p>
+            
+            <div class="quiz-card" id="quizCard">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span class="badge badge-yellow" id="quizCategory">SMA</span>
+                    <span class="badge badge-green" id="quizDifficulty">Mudah</span>
+                </div>
+                <h3 id="quizQuestion">Memuat soal...</h3>
+                <div class="quiz-options" id="quizOptions"></div>
+                <div id="quizExplanation" style="display: none;"></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                    <button class="btn btn-secondary" onclick="prevQuestion()">← Sebelumnya</button>
+                    <span id="quizProgress">1 / 8</span>
+                    <button class="btn btn-primary" onclick="nextQuestion()">Selanjutnya →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCIENTIFIC CALCULATOR -->
+        <section id="scientific" class="section">
+            <h1 class="section-title">🔢 Scientific Calculator</h1>
+            <p class="section-subtitle">Kalkulator ilmiah dengan fungsi trigonometri, logaritma, dan eksponen.</p>
+            
+            <div class="sci-calc">
+                <div class="calc-display" id="calcDisplay">0</div>
+                <div class="calc-buttons">
+                    <button class="calc-btn" onclick="calcClear()">C</button>
+                    <button class="calc-btn" onclick="calcInput('(')">(</button>
+                    <button class="calc-btn" onclick="calcInput(')')">)</button>
+                    <button class="calc-btn" onclick="calcOp('/')">÷</button>
+                    
+                    <button class="calc-btn" onclick="calcInput('7')">7</button>
+                    <button class="calc-btn" onclick="calcInput('8')">8</button>
+                    <button class="calc-btn" onclick="calcInput('9')">9</button>
+                    <button class="calc-btn" onclick="calcOp('*')">×</button>
+                    
+                    <button class="calc-btn" onclick="calcInput('4')">4</button>
+                    <button class="calc-btn" onclick="calcInput('5')">5</button>
+                    <button class="calc-btn" onclick="calcInput('6')">6</button>
+                    <button class="calc-btn" onclick="calcOp('-')">−</button>
+                    
+                    <button class="calc-btn" onclick="calcInput('1')">1</button>
+                    <button class="calc-btn" onclick="calcInput('2')">2</button>
+                    <button class="calc-btn" onclick="calcInput('3')">3</button>
+                    <button class="calc-btn" onclick="calcOp('+')">+</button>
+                    
+                    <button class="calc-btn" onclick="calcInput('0')">0</button>
+                    <button class="calc-btn" onclick="calcInput('.')">.</button>
+                    <button class="calc-btn" onclick="calcOp('**')">^</button>
+                    <button class="calc-btn" onclick="calcEqual()">=</button>
+                    
+                    <button class="calc-btn" onclick="calcFunc('sin')">sin</button>
+                    <button class="calc-btn" onclick="calcFunc('cos')">cos</button>
+                    <button class="calc-btn" onclick="calcFunc('tan')">tan</button>
+                    <button class="calc-btn" onclick="calcFunc('log')">log</button>
+                    
+                    <button class="calc-btn" onclick="calcFunc('ln')">ln</button>
+                    <button class="calc-btn" onclick="calcFunc('sqrt')">√</button>
+                    <button class="calc-btn" onclick="calcFunc('abs')">|x|</button>
+                    <button class="calc-btn" onclick="calcInput('3.14159')">π</button>
+                    
+                    <button class="calc-btn span-2" onclick="calcFunc('exp')">e^x</button>
+                    <button class="calc-btn span-2" onclick="calcFunc('fact')">n!</button>
+                </div>
+                <div id="calcHistory" class="mt-2" style="font-size: 0.85rem; color: var(--text-muted);"></div>
+            </div>
+        </section>
+
+        <!-- CHEAT SHEET -->
+        <section id="cheatsheet" class="section">
+            <h1 class="section-title">📋 Physics Cheat Sheet</h1>
+            <p class="section-subtitle">Ringkasan cepat rumus penting, satuan SI, dan konstanta fisika.</p>
+            
+            <h3 class="mb-2">📐 Rumus Mekanika</h3>
+            <table class="cheat-table">
+                <tr><th>Rumus</th><th>Penjelasan</th><th>Satuan</th></tr>
+                <tr><td>F = ma</td><td>Gaya = massa × percepatan</td><td>N</td></tr>
+                <tr><td>Ek = ½mv²</td><td>Energi kinetik</td><td>J</td></tr>
+                <tr><td>Ep = mgh</td><td>Energi potensial gravitasi</td><td>J</td></tr>
+                <tr><td>W = Fs</td><td>Usaha</td><td>J</td></tr>
+                <tr><td>p = mv</td><td>Momentum</td><td>kg·m/s</td></tr>
+                <tr><td>I = FΔt</td><td>Impuls</td><td>N·s</td></tr>
+            </table>
+            
+            <h3 class="mb-2">⚡ Rumus Listrik</h3>
+            <table class="cheat-table">
+                <tr><th>Rumus</th><th>Penjelasan</th><th>Satuan</th></tr>
+                <tr><td>V = IR</td><td>Hukum Ohm</td><td>V</td></tr>
+                <tr><td>P = VI = I²R</td><td>Daya listrik</td><td>W</td></tr>
+                <tr><td>R_s = R₁ + R₂</td><td>Hambatan seri</td><td>Ω</td></tr>
+                <tr><td>1/R_p = 1/R₁ + 1/R₂</td><td>Hambatan paralel</td><td>Ω</td></tr>
+            </table>
+            
+            <h3 class="mb-2">〰️ Rumus Gelombang</h3>
+            <table class="cheat-table">
+                <tr><th>Rumus</th><th>Penjelasan</th><th>Satuan</th></tr>
+                <tr><td>v = fλ</td><td>Cepat rambat gelombang</td><td>m/s</td></tr>
+                <tr><td>f = 1/T</td><td>Frekuensi</td><td>Hz</td></tr>
+                <tr><td>T = 1/f</td><td>Periode</td><td>s</td></tr>
+            </table>
+            
+            <h3 class="mb-2">💧 Rumus Fluida</h3>
+            <table class="cheat-table">
+                <tr><th>Rumus</th><th>Penjelasan</th><th>Satuan</th></tr>
+                <tr><td>P = F/A = ρgh</td><td>Tekanan</td><td>Pa</td></tr>
+                <tr><td>F_a = ρVg</td><td>Hukum Archimedes</td><td>N</td></tr>
+                <tr><td>Q = V/t = Av</td><td>Debit</td><td>m³/s</td></tr>
+                <tr><td>ρ = m/V</td><td>Massa jenis</td><td>kg/m³</td></tr>
+            </table>
+            
+            <h3 class="mb-2">🌡️ Termodinamika</h3>
+            <table class="cheat-table">
+                <tr><th>Rumus</th><th>Penjelasan</th><th>Satuan</th></tr>
+                <tr><td>PV = nRT</td><td>Persamaan gas ideal</td><td>Pa·m³</td></tr>
+                <tr><td>Q = mcΔT</td><td>Kalor</td><td>J</td></tr>
+            </table>
+            
+            <h3 class="mb-2">🔬 Konstanta Fisika</h3>
+            <table class="cheat-table">
+                <tr><th>Simbol</th><th>Nama</th><th>Nilai</th><th>Satuan</th></tr>
+                <tr><td>g</td><td>Percepatan gravitasi</td><td>9.8</td><td>m/s²</td></tr>
+                <tr><td>c</td><td>Kecepatan cahaya</td><td>3 × 10⁸</td><td>m/s</td></tr>
+                <tr><td>G</td><td>Konstanta gravitasi</td><td>6.674 × 10⁻¹¹</td><td>N·m²/kg²</td></tr>
+                <tr><td>e</td><td>Muatan elektron</td><td>1.602 × 10⁻¹⁹</td><td>C</td></tr>
+                <tr><td>h</td><td>Konstanta Planck</td><td>6.626 × 10⁻³⁴</td><td>J·s</td></tr>
+                <tr><td>R</td><td>Konstanta gas ideal</td><td>8.314</td><td>J/(mol·K)</td></tr>
+                <tr><td>N_A</td><td>Bilangan Avogadro</td><td>6.022 × 10²³</td><td>mol⁻¹</td></tr>
+                <tr><td>k</td><td>Konstanta Boltzmann</td><td>1.381 × 10⁻²³</td><td>J/K</td></tr>
+            </table>
+            
+            <h3 class="mb-2">📏 Prefix SI</h3>
+            <table class="cheat-table">
+                <tr><th>Prefix</th><th>Simbol</th><th>Faktor</th></tr>
+                <tr><td>Tera</td><td>T</td><td>10¹²</td></tr>
+                <tr><td>Giga</td><td>G</td><td>10⁹</td></tr>
+                <tr><td>Mega</td><td>M</td><td>10⁶</td></tr>
+                <tr><td>Kilo</td><td>k</td><td>10³</td></tr>
+                <tr><td>Centi</td><td>c</td><td>10⁻²</td></tr>
+                <tr><td>Milli</td><td>m</td><td>10⁻³</td></tr>
+                <tr><td>Micro</td><td>μ</td><td>10⁻⁶</td></tr>
+                <tr><td>Nano</td><td>n</td><td>10⁻⁹</td></tr>
+                <tr><td>Pico</td><td>p</td><td>10⁻¹²</td></tr>
+            </table>
+        </section>
+
+    </div>
+
+    <script>
+        // ==================== STATE & NAVIGATION ====================
+        let currentSection = 'home';
+        let questions = [];
+        let currentQuestion = 0;
+        let labAnimationId = null;
+        let labMode = 'freefall';
+        let calcExpression = '';
+        let calcHistory = [];
+
+        const formulaData = {
+            'newton': { name: 'Hukum Newton II', formula: 'F = m × a', vars: {m:'Massa (kg)', a:'Percepatan (m/s²)'}, result: 'Gaya (N)', category: 'Mekanika' },
+            'kinetic_energy': { name: 'Energi Kinetik', formula: 'E_k = ½mv²', vars: {m:'Massa (kg)', v:'Kecepatan (m/s)'}, result: 'Energi (J)', category: 'Mekanika' },
+            'potential_energy': { name: 'Energi Potensial', formula: 'E_p = mgh', vars: {m:'Massa (kg)', h:'Ketinggian (m)'}, result: 'Energi (J)', category: 'Mekanika' },
+            'work': { name: 'Usaha', formula: 'W = F × s', vars: {F:'Gaya (N)', s:'Jarak (m)'}, result: 'Usaha (J)', category: 'Mekanika' },
+            'momentum': { name: 'Momentum', formula: 'p = m × v', vars: {m:'Massa (kg)', v:'Kecepatan (m/s)'}, result: 'Momentum (kg·m/s)', category: 'Mekanika' },
+            'impulse': { name: 'Impuls', formula: 'I = F × Δt', vars: {F:'Gaya (N)', t:'Waktu (s)'}, result: 'Impuls (N·s)', category: 'Mekanika' },
+            'ohm': { name: 'Hukum Ohm', formula: 'V = I × R', vars: {I:'Arus (A)', R:'Hambatan (Ω)'}, result: 'Tegangan (V)', category: 'Listrik' },
+            'electric_power': { name: 'Daya Listrik', formula: 'P = V × I', vars: {V:'Tegangan (V)', I:'Arus (A)'}, result: 'Daya (W)', category: 'Listrik' },
+            'resistance_series': { name: 'Hambatan Seri', formula: 'R_t = R₁ + R₂', vars: {R1:'R₁ (Ω)', R2:'R₂ (Ω)'}, result: 'R_total (Ω)', category: 'Listrik' },
+            'resistance_parallel': { name: 'Hambatan Paralel', formula: '1/R_t = 1/R₁ + 1/R₂', vars: {R1:'R₁ (Ω)', R2:'R₂ (Ω)'}, result: 'R_total (Ω)', category: 'Listrik' },
+            'frequency': { name: 'Frekuensi', formula: 'f = 1/T', vars: {T:'Periode (s)'}, result: 'Frekuensi (Hz)', category: 'Gelombang' },
+            'wave_speed': { name: 'Cepat Rambat', formula: 'v = f × λ', vars: {f:'Frekuensi (Hz)', lambda:'Panjang gelombang (m)'}, result: 'Cepat rambat (m/s)', category: 'Gelombang' },
+            'pressure': { name: 'Tekanan', formula: 'P = F/A', vars: {F:'Gaya (N)', A:'Luas (m²)'}, result: 'Tekanan (Pa)', category: 'Fluida' },
+            'archimedes': { name: 'Hukum Archimedes', formula: 'F_a = ρVg', vars: {rho:'Massa jenis (kg/m³)', V:'Volume (m³)'}, result: 'Gaya apung (N)', category: 'Fluida' },
+            'flow_rate': { name: 'Debit', formula: 'Q = V/t', vars: {V:'Volume (m³)', t:'Waktu (s)'}, result: 'Debit (m³/s)', category: 'Fluida' },
+            'density': { name: 'Massa Jenis', formula: 'ρ = m/V', vars: {m:'Massa (kg)', V:'Volume (m³)'}, result: 'Massa jenis (kg/m³)', category: 'Fluida' },
+            'ideal_gas': { name: 'Gas Ideal', formula: 'PV = nRT', vars: {P:'Tekanan (Pa)', V:'Volume (m³)', n:'Mol', T:'Suhu (K)'}, result: 'PV - nRT (J)', category: 'Termodinamika' }
+        };
+
+        const convUnits = {
+            'length': ['m', 'cm', 'mm', 'km', 'inch', 'ft', 'mile', 'yard'],
+            'mass': ['kg', 'g', 'mg', 'ton', 'lb', 'oz'],
+            'time': ['s', 'min', 'hour', 'day', 'week', 'year'],
+            'temperature': ['C', 'F', 'K'],
+            'energy': ['J', 'kJ', 'cal', 'kcal', 'eV', 'Wh', 'kWh'],
+            'force': ['N', 'kN', 'dyne', 'kgf', 'lbf'],
+            'velocity': ['m/s', 'km/h', 'mph', 'knot', 'ft/s'],
+            'pressure': ['Pa', 'kPa', 'MPa', 'bar', 'atm', 'psi', 'mmHg'],
+            'power': ['W', 'kW', 'MW', 'hp', 'BTU/h']
+        };
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            // Update nav active state
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                if(btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(id)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            currentSection = id;
+            
+            if(id === 'practice') loadQuestions();
+            if(id === 'formulas') renderFormulaList();
+            if(id === 'converter') updateConvUnits();
+            if(id === 'graph') updateGraphForm();
+            if(id === 'calculator') updateCalcForm();
+            if(id === 'lab') initLab();
+            
+            window.scrollTo(0, 0);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+        }
+
+        function toggleMobile() {
+            document.getElementById('mobileNav').classList.toggle('show');
+        }
+
+        // ==================== CALCULATOR ====================
+        function selectFormula(id) {
+            document.getElementById('calcFormula').value = id;
+            updateCalcForm();
+        }
+
+        function updateCalcForm() {
+            const id = document.getElementById('calcFormula').value;
+            const container = document.getElementById('calcInputs');
+            
+            if(!id || !formulaData[id]) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Pilih rumus untuk melihat form input.</p>';
+                return;
+            }
+            
+            const f = formulaData[id];
+            let html = `<div class="formula-math">${f.formula}</div>`;
+            
+            Object.entries(f.vars).forEach(([key, label]) => {
+                html += `
+                    <div class="form-group">
+                        <label>${label}</label>
+                        <input type="number" id="calc_${key}" step="any" placeholder="Masukkan nilai ${key}">
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            document.getElementById('calcResult').innerHTML = '';
+        }
+
+        async function calculate() {
+            const id = document.getElementById('calcFormula').value;
+            if(!id) return alert('Pilih rumus terlebih dahulu!');
+            
+            const f = formulaData[id];
+            const values = {};
+            
+            Object.keys(f.vars).forEach(key => {
+                const val = document.getElementById(`calc_${key}`).value;
+                if(!val) return alert(`Masukkan nilai untuk ${key}!`);
+                values[key] = parseFloat(val);
+            });
+            
+            try {
+                const res = await fetch('/api/calculate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({formula: id, values})
+                });
+                
+                const data = await res.json();
+                
+                if(data.success) {
+                    let stepsHtml = data.steps.map((s, i) => `<li>${s}</li>`).join('');
+                    
+                    document.getElementById('calcResult').innerHTML = `
+                        <div class="result-box">
+                            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">${data.formula_name}</div>
+                            <div class="result-value">${data.result.toPrecision(6)} ${data.unit}</div>
+                            <div style="margin-top: 0.5rem; font-size: 0.9rem;">${data.explanation}</div>
+                        </div>
+                        <div class="steps-list">
+                            <h4>📋 Langkah Pengerjaan:</h4>
+                            <ol>${stepsHtml}</ol>
+                        </div>
+                    `;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch(e) {
+                alert('Gagal menghitung. Pastikan server berjalan.');
+            }
+        }
+
+        // ==================== FORMULA LIBRARY ====================
+        function renderFormulaList(filter = '') {
+            const container = document.getElementById('formulaList');
+            let html = '';
+            
+            Object.entries(formulaData).forEach(([id, f]) => {
+                if(filter && !f.name.toLowerCase().includes(filter.toLowerCase()) && 
+                   !f.formula.toLowerCase().includes(filter.toLowerCase()) &&
+                   !f.category.toLowerCase().includes(filter.toLowerCase())) return;
+                
+                let tagClass = 'tag-mekanika';
+                if(f.category === 'Listrik') tagClass = 'tag-listrik';
+                if(f.category === 'Gelombang') tagClass = 'tag-gelombang';
+                if(f.category === 'Fluida') tagClass = 'tag-fluida';
+                if(f.category === 'Termodinamika') tagClass = 'tag-termo';
+                
+                html += `
+                    <div class="formula-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3>${f.name}</h3>
+                            <span class="card-tag ${tagClass}">${f.category}</span>
+                        </div>
+                        <div class="formula-math">${f.formula}</div>
+                        <p><strong>Hasil:</strong> ${f.result}</p>
+                        <button class="btn btn-primary" style="margin-top: 0.5rem;" onclick="showSection('calculator'); selectFormula('${id}')">
+                            🧮 Gunakan Kalkulator
+                        </button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html || '<p style="text-align: center; color: var(--text-muted);">Tidak ada rumus yang cocok.</p>';
+        }
+
+        function searchFormulas(query) {
+            renderFormulaList(query);
+        }
+
+        function searchGlobal(query) {
+            if(!query) return;
+            query = query.toLowerCase();
+            
+            const keywords = {
+                'newton': 'calculator', 'gaya': 'calculator', 'massa': 'calculator',
+                'energi': 'calculator', 'kinetik': 'calculator', 'potensial': 'calculator',
+                'usaha': 'calculator', 'momentum': 'calculator', 'impuls': 'calculator',
+                'ohm': 'calculator', 'listrik': 'calculator', 'tegangan': 'calculator',
+                'gelombang': 'calculator', 'frekuensi': 'calculator',
+                'fluida': 'calculator', 'tekanan': 'calculator', 'archimedes': 'calculator',
+                'konversi': 'converter', 'satuan': 'converter', 'ubah': 'converter',
+                'grafik': 'graph', 'chart': 'graph', 'plot': 'graph',
+                'latihan': 'practice', 'soal': 'practice', 'quiz': 'practice',
+                'kalkulator': 'scientific', 'scientific': 'scientific', 'hitung': 'scientific',
+                'rumus': 'formulas', 'formula': 'formulas', 'daftar': 'formulas',
+                'ai': 'ai', 'asisten': 'ai', 'tanya': 'ai',
+                'simulasi': 'lab', 'lab': 'lab', 'virtual': 'lab',
+                'ringkasan': 'cheatsheet', 'cheat': 'cheatsheet', 'konstanta': 'cheatsheet'
+            };
+            
+            for(let [key, section] of Object.entries(keywords)) {
+                if(query.includes(key)) {
+                    showSection(section);
+                    return;
+                }
+            }
+            
+            alert('Coba cari: rumus, kalkulator, konverter, grafik, latihan, simulasi, atau ringkasan');
+        }
+
+        // ==================== CONVERTER ====================
+        function updateConvUnits() {
+            const cat = document.getElementById('convCategory').value;
+            const fromSel = document.getElementById('convFrom');
+            const toSel = document.getElementById('convTo');
+            const units = convUnits[cat];
+            
+            fromSel.innerHTML = units.map(u => `<option value="${u}">${u}</option>`).join('');
+            toSel.innerHTML = units.map(u => `<option value="${u}">${u}</option>`).join('');
+            
+            if(units.length > 1) toSel.selectedIndex = 1;
+        }
+
+        function swapConv() {
+            const from = document.getElementById('convFrom');
+            const to = document.getElementById('convTo');
+            const temp = from.value;
+            from.value = to.value;
+            to.value = temp;
+        }
+
+        async function convert() {
+            const category = document.getElementById('convCategory').value;
+            const value = parseFloat(document.getElementById('convValue').value);
+            const from = document.getElementById('convFrom').value;
+            const to = document.getElementById('convTo').value;
+            
+            if(isNaN(value)) return alert('Masukkan nilai yang valid!');
+            
+            try {
+                const res = await fetch('/api/convert', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({category, value, from, to})
+                });
+                
+                const data = await res.json();
+                
+                if(data.success) {
+                    document.getElementById('convResult').innerHTML = `
+                        <div class="result-box" style="text-align: center;">
+                            <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">
+                                ${data.from} = <span class="result-value">${data.result.toPrecision(6)} ${to}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch(e) {
+                alert('Gagal mengkonversi.');
+            }
+        }
+
+        // ==================== GRAPH ====================
+        function updateGraphForm() {
+            const type = document.getElementById('graphType').value;
+            const container = document.getElementById('graphInputs');
+            
+            const forms = {
+                'wave': `
+                    <div class="form-group"><label>Amplitudo (A)</label><input type="number" id="g_amp" value="1" step="any"></div>
+                    <div class="form-group"><label>Frekuensi Sudut (ω)</label><input type="number" id="g_omega" value="1" step="any"></div>
+                `,
+                'free_fall': `
+                    <div class="form-group"><label>Ketinggian Awal (m)</label><input type="number" id="g_h0" value="100" step="any"></div>
+                `,
+                'glbb': `
+                    <div class="form-group"><label>Percepatan (m/s²)</label><input type="number" id="g_a" value="2" step="any"></div>
+                    <div class="form-group"><label>Kecepatan Awal (m/s)</label><input type="number" id="g_v0" value="0" step="any"></div>
+                `,
+                'position_time': `
+                    <div class="form-group"><label>Kecepatan (m/s)</label><input type="number" id="g_v" value="5" step="any"></div>
+                `,
+                'spring': `
+                    <div class="form-group"><label>Amplitudo (m)</label><input type="number" id="g_amp" value="1" step="any"></div>
+                    <div class="form-group"><label>Konstanta Pegas (N/m)</label><input type="number" id="g_k" value="10" step="any"></div>
+                    <div class="form-group"><label>Massa (kg)</label><input type="number" id="g_mass" value="1" step="any"></div>
+                `
+            };
+            
+            container.innerHTML = forms[type] || '';
+        }
+
+        async function generateGraph() {
+            const type = document.getElementById('graphType').value;
+            const params = {type};
+            
+            if(type === 'wave') {
+                params.amplitude = document.getElementById('g_amp').value;
+                params.omega = document.getElementById('g_omega').value;
+            } else if(type === 'free_fall') {
+                params.h0 = document.getElementById('g_h0').value;
+            } else if(type === 'glbb') {
+                params.a = document.getElementById('g_a').value;
+                params.v0 = document.getElementById('g_v0').value;
+            } else if(type === 'position_time') {
+                params.velocity = document.getElementById('g_v').value;
+            } else if(type === 'spring') {
+                params.amplitude = document.getElementById('g_amp').value;
+                params.k = document.getElementById('g_k').value;
+                params.mass = document.getElementById('g_mass').value;
+            }
+            
+            try {
+                const res = await fetch('/api/graph', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(params)
+                });
+                
+                const data = await res.json();
+                
+                if(data.success) {
+                    document.getElementById('graphResult').style.display = 'block';
+                    document.getElementById('graphImage').src = data.image;
+                }
+            } catch(e) {
+                alert('Gagal membuat grafik.');
+            }
+        }
+
+        // ==================== AI ASSISTANT ====================
+        function setAIQuery(q) {
+            document.getElementById('aiQuery').value = q;
+            askAI();
+        }
+
+        async function askAI() {
+            const query = document.getElementById('aiQuery').value;
+            if(!query) return;
+            
+            const responseDiv = document.getElementById('aiResponse');
+            responseDiv.innerHTML = '<p style="color: var(--text-muted);">🤖 Memproses pertanyaan...</p>';
+            
+            try {
+                const res = await fetch('/api/ai-assistant', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query})
+                });
+                
+                const data = await res.json();
+                
+                if(data.understood) {
+                    let stepsHtml = data.steps.map(s => `<li>${s}</li>`).join('');
+                    responseDiv.innerHTML = `
+                        <div class="chat-response">
+                            <div style="margin-bottom: 1rem;"><strong>${data.message}</strong></div>
+                            <div class="result-box">
+                                <div style="font-size: 0.9rem; color: var(--text-muted);">${data.formula_name}</div>
+                                <div class="result-value">${data.result} ${data.unit}</div>
+                            </div>
+                            <div class="steps-list">
+                                <ol>${stepsHtml}</ol>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    let suggestions = data.suggestions.map(s => `<span class="chip" onclick="setAIQuery('${s}')">${s}</span>`).join('');
+                    responseDiv.innerHTML = `
+                        <div class="chat-response">
+                            <p>${data.message}</p>
+                            <div class="suggestion-chips">${suggestions}</div>
+                        </div>
+                    `;
+                }
+            } catch(e) {
+                responseDiv.innerHTML = '<p style="color: var(--danger);">Error: Tidak dapat menghubungi AI Assistant.</p>';
+            }
+        }
+
+        // ==================== VIRTUAL LAB ====================
+        function setLabMode(mode) {
+            labMode = mode;
+            initLab();
+        }
+
+        function initLab() {
+            const canvas = document.getElementById('labCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            const controls = document.getElementById('labControls');
+            
+            if(labMode === 'freefall') {
+                controls.innerHTML = `
+                    <div class="form-group"><label>Massa (kg)</label><input type="range" id="lf_mass" min="0.1" max="10" step="0.1" value="1" oninput="document.getElementById('lf_mass_val').textContent=this.value+' kg'"><span id="lf_mass_val">1 kg</span></div>
+                    <div class="form-group"><label>Ketinggian (m)</label><input type="range" id="lf_h" min="10" max="200" step="5" value="100" oninput="document.getElementById('lf_h_val').textContent=this.value+' m'"><span id="lf_h_val">100 m</span></div>
+                    <div class="form-group"><label>Gravitasi (m/s²)</label><input type="range" id="lf_g" min="1" max="20" step="0.5" value="9.8" oninput="document.getElementById('lf_g_val').textContent=this.value+' m/s²'"><span id="lf_g_val">9.8 m/s²</span></div>
+                `;
+                drawFreeFallFrame(0);
+            } else if(labMode === 'wave') {
+                controls.innerHTML = `
+                    <div class="form-group"><label>Amplitudo</label><input type="range" id="lw_amp" min="10" max="100" value="50" oninput="document.getElementById('lw_amp_val').textContent=this.value"><span id="lw_amp_val">50</span></div>
+                    <div class="form-group"><label>Frekuensi</label><input type="range" id="lw_freq" min="1" max="10" value="2" oninput="document.getElementById('lw_freq_val').textContent=this.value"><span id="lw_freq_val">2</span></div>
+                    <div class="form-group"><label>Kecepatan</label><input type="range" id="lw_speed" min="1" max="5" value="2" oninput="document.getElementById('lw_speed_val').textContent=this.value"><span id="lw_speed_val">2</span></div>
+                `;
+                drawWaveFrame(0);
+            } else if(labMode === 'spring') {
+                controls.innerHTML = `
+                    <div class="form-group"><label>Massa (kg)</label><input type="range" id="ls_mass" min="0.5" max="5" step="0.1" value="1" oninput="document.getElementById('ls_mass_val').textContent=this.value+' kg'"><span id="ls_mass_val">1 kg</span></div>
+                    <div class="form-group"><label>Konstanta Pegas (N/m)</label><input type="range" id="ls_k" min="5" max="50" step="1" value="10" oninput="document.getElementById('ls_k_val').textContent=this.value+' N/m'"><span id="ls_k_val">10 N/m</span></div>
+                    <div class="form-group"><label>Amplitudo (m)</label><input type="range" id="ls_amp" min="10" max="80" value="40" oninput="document.getElementById('ls_amp_val').textContent=this.value+' px'"><span id="ls_amp_val">40 px</span></div>
+                `;
+                drawSpringFrame(0);
+            }
+        }
+
+        let simTime = 0;
+        let isSimulating = false;
+
+        function startSimulation() {
+            if(isSimulating) return;
+            isSimulating = true;
+            simTime = 0;
+            animate();
+        }
+
+        function stopSimulation() {
+            isSimulating = false;
+            if(labAnimationId) cancelAnimationFrame(labAnimationId);
+        }
+
+        function resetSimulation() {
+            stopSimulation();
+            simTime = 0;
+            if(labMode === 'freefall') drawFreeFallFrame(0);
+            else if(labMode === 'wave') drawWaveFrame(0);
+            else if(labMode === 'spring') drawSpringFrame(0);
+        }
+
+        function animate() {
+            if(!isSimulating) return;
+            simTime += 0.016;
+            
+            if(labMode === 'freefall') drawFreeFallFrame(simTime);
+            else if(labMode === 'wave') drawWaveFrame(simTime);
+            else if(labMode === 'spring') drawSpringFrame(simTime);
+            
+            labAnimationId = requestAnimationFrame(animate);
+        }
+
+        function drawFreeFallFrame(t) {
+            const canvas = document.getElementById('labCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            
+            const g = parseFloat(document.getElementById('lf_g')?.value || 9.8);
+            const h0 = parseFloat(document.getElementById('lf_h')?.value || 100);
+            const mass = parseFloat(document.getElementById('lf_mass')?.value || 1);
+            
+            const scale = (h - 100) / 200;
+            const y = Math.min(0.5 * g * t * t, h0);
+            const pixelY = 50 + y * scale * (200/h0);
+            
+            ctx.fillStyle = getComputedStyle(document.body).backgroundColor;
+            ctx.fillRect(0, 0, w, h);
+            
+            // Ground
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, h - 30, w, 30);
+            
+            // Ruler
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 1;
+            for(let i = 0; i <= 200; i += 20) {
+                const py = 50 + i * scale * (200/h0);
+                ctx.beginPath();
+                ctx.moveTo(w - 60, py);
+                ctx.lineTo(w - 50, py);
+                ctx.stroke();
+                ctx.fillStyle = '#666';
+                ctx.font = '12px sans-serif';
+                ctx.fillText(i + 'm', w - 45, py + 4);
+            }
+            
+            // Ball
+            const ballY = Math.min(pixelY, h - 50);
+            ctx.beginPath();
+            ctx.arc(w/2, ballY, 10 + mass * 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#e74c3c';
+            ctx.fill();
+            ctx.strokeStyle = '#c0392b';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Info
+            ctx.fillStyle = getComputedStyle(document.body).color;
+            ctx.font = '14px sans-serif';
+            ctx.fillText(`t = ${t.toFixed(2)} s`, 20, 30);
+            ctx.fillText(`y = ${y.toFixed(1)} m`, 20, 50);
+            ctx.fillText(`v = ${(g*t).toFixed(1)} m/s`, 20, 70);
+            ctx.fillText(`m = ${mass} kg`, 20, 90);
+        }
+
+        function drawWaveFrame(t) {
+            const canvas = document.getElementById('labCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            
+            const amp = parseFloat(document.getElementById('lw_amp')?.value || 50);
+            const freq = parseFloat(document.getElementById('lw_freq')?.value || 2);
+            const speed = parseFloat(document.getElementById('lw_speed')?.value || 2);
+            
+            ctx.fillStyle = getComputedStyle(document.body).backgroundColor;
+            ctx.fillRect(0, 0, w, h);
+            
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for(let x = 0; x < w; x++) {
+                const y = h/2 + amp * Math.sin((x / 50) * freq - t * speed * 5);
+                if(x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            // Axis
+            ctx.strokeStyle = '#999';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, h/2);
+            ctx.lineTo(w, h/2);
+            ctx.stroke();
+            
+            ctx.fillStyle = getComputedStyle(document.body).color;
+            ctx.font = '14px sans-serif';
+            ctx.fillText(`A = ${amp}, f = ${freq}, t = ${t.toFixed(2)}s`, 20, 30);
+        }
+
+        function drawSpringFrame(t) {
+            const canvas = document.getElementById('labCanvas');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            
+            const mass = parseFloat(document.getElementById('ls_mass')?.value || 1);
+            const k = parseFloat(document.getElementById('ls_k')?.value || 10);
+            const amp = parseFloat(document.getElementById('ls_amp')?.value || 40);
+            
+            const omega = Math.sqrt(k / mass);
+            const y = amp * Math.cos(omega * t);
+            
+            ctx.fillStyle = getComputedStyle(document.body).backgroundColor;
+            ctx.fillRect(0, 0, w, h);
+            
+            const centerX = w / 2;
+            const restY = h / 2;
+            const ballY = restY + y;
+            
+            // Ceiling
+            ctx.fillStyle = '#666';
+            ctx.fillRect(centerX - 40, 20, 80, 10);
+            
+            // Spring
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 30);
+            
+            const coils = 10;
+            const springLen = ballY - 30;
+            for(let i = 0; i <= coils; i++) {
+                const x = centerX + (i % 2 === 0 ? -15 : 15);
+                const y = 30 + (springLen / coils) * i;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(centerX, ballY - 15);
+            ctx.stroke();
+            
+            // Mass
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(centerX - 15 - mass * 2, ballY - 15, 30 + mass * 4, 30);
+            
+            // Info
+            ctx.fillStyle = getComputedStyle(document.body).color;
+            ctx.font = '14px sans-serif';
+            ctx.fillText(`ω = ${omega.toFixed(2)} rad/s`, 20, 30);
+            ctx.fillText(`y = ${y.toFixed(1)} px`, 20, 50);
+            ctx.fillText(`T = ${(2*Math.PI/omega).toFixed(2)} s`, 20, 70);
+        }
+
+        // ==================== PRACTICE ====================
+        async function loadQuestions() {
+            if(questions.length > 0) return;
+            
+            try {
+                const res = await fetch('/api/questions');
+                const data = await res.json();
+                if(data.success) {
+                    questions = data.questions;
+                    renderQuestion();
+                }
+            } catch(e) {
+                console.error('Failed to load questions');
+            }
+        }
+
+        function renderQuestion() {
+            if(questions.length === 0) return;
+            
+            const q = questions[currentQuestion];
+            document.getElementById('quizCategory').textContent = q.category;
+            document.getElementById('quizDifficulty').textContent = q.difficulty;
+            document.getElementById('quizQuestion').textContent = `${currentQuestion + 1}. ${q.question}`;
+            document.getElementById('quizProgress').textContent = `${currentQuestion + 1} / ${questions.length}`;
+            
+            const optsDiv = document.getElementById('quizOptions');
+            optsDiv.innerHTML = q.options.map((opt, i) => `
+                <div class="quiz-option" onclick="checkAnswer(${i})" id="opt_${i}">${opt}</div>
+            `).join('');
+            
+            document.getElementById('quizExplanation').style.display = 'none';
+            document.getElementById('quizExplanation').innerHTML = '';
+        }
+
+        async function checkAnswer(ans) {
+            const q = questions[currentQuestion];
+            
+            // Disable all options
+            document.querySelectorAll('.quiz-option').forEach((el, i) => {
+                el.style.pointerEvents = 'none';
+                if(i === q.answer) el.classList.add('correct');
+                else if(i === ans && i !== q.answer) el.classList.add('wrong');
+            });
+            
+            const expl = document.getElementById('quizExplanation');
+            expl.style.display = 'block';
+            expl.innerHTML = `
+                <div style="padding: 1rem; background: ${ans === q.answer ? '#d1fae5' : '#fee2e2'}; border-radius: 8px; margin-top: 1rem;">
+                    <strong>${ans === q.answer ? '✅ Benar!' : '❌ Salah'}</strong>
+                    <p style="margin-top: 0.5rem;">${q.explanation}</p>
+                </div>
+            `;
+        }
+
+        function nextQuestion() {
+            if(currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            if(currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        // ==================== SCIENTIFIC CALCULATOR ====================
+        function calcInput(val) {
+            if(calcExpression === '0') calcExpression = '';
+            calcExpression += val;
+            updateCalcDisplay();
+        }
+
+        function calcOp(op) {
+            calcExpression += ' ' + op + ' ';
+            updateCalcDisplay();
+        }
+
+        function calcFunc(func) {
+            calcExpression += func + '(';
+            updateCalcDisplay();
+        }
+
+        function calcClear() {
+            calcExpression = '';
+            updateCalcDisplay();
+            document.getElementById('calcHistory').innerHTML = '';
+        }
+
+        function updateCalcDisplay() {
+            document.getElementById('calcDisplay').textContent = calcExpression || '0';
+        }
+
+        function calcEqual() {
+            try {
+                let expr = calcExpression
+                    .replace(/sin\(/g, 'Math.sin(')
+                    .replace(/cos\(/g, 'Math.cos(')
+                    .replace(/tan\(/g, 'Math.tan(')
+                    .replace(/log\(/g, 'Math.log10(')
+                    .replace(/ln\(/g, 'Math.log(')
+                    .replace(/sqrt\(/g, 'Math.sqrt(')
+                    .replace(/abs\(/g, 'Math.abs(')
+                    .replace(/exp\(/g, 'Math.exp(')
+                    .replace(/fact\(/g, 'factorial(')
+                    .replace(/\^/g, '**')
+                    .replace(/π/g, 'Math.PI');
+                
+                // Factorial helper
+                const factorial = (n) => n <= 1 ? 1 : n * factorial(n - 1);
+                
+                const result = eval(expr);
+                const history = document.getElementById('calcHistory');
+                history.innerHTML += `<div>${calcExpression} = ${result}</div>`;
+                calcExpression = String(result);
+                updateCalcDisplay();
+            } catch(e) {
+                document.getElementById('calcDisplay').textContent = 'Error';
+                setTimeout(() => {
+                    calcExpression = '';
+                    updateCalcDisplay();
+                }, 1500);
+            }
+        }
+
+        // ==================== INIT ====================
+        window.onload = function() {
+            renderFormulaList();
+            updateConvUnits();
+            updateGraphForm();
+            updateCalcForm();
+        };
+    </script>
+</body>
+</html>
