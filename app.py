@@ -12,12 +12,11 @@ import re
 app = Flask(__name__)
 
 # ==================== DATA FISIKA ====================
-
 CONSTANTS = {
     'g': {'value': 9.8, 'unit': 'm/s²', 'name': 'Percepatan gravitasi bumi'},
-    'c': {'value': 3e8, 'unit': 'm/s', 'name': 'Kecepatan cahaya dalam vakum'},
-    'G': {'value': 6.674e-11, 'unit': 'N·m²/kg²', 'name': 'Konstanta gravitasi universal'},
-    'e': {'value': 1.602e-19, 'unit': 'C', 'name': 'Muatan dasar elektron'},
+    'c': {'value': 3e8, 'unit': 'm/s', 'name': 'Kecepatan cahaya'},
+    'G': {'value': 6.674e-11, 'unit': 'N·m²/kg²', 'name': 'Konstanta gravitasi'},
+    'e': {'value': 1.602e-19, 'unit': 'C', 'name': 'Muatan elektron'},
     'h': {'value': 6.626e-34, 'unit': 'J·s', 'name': 'Konstanta Planck'},
     'R': {'value': 8.314, 'unit': 'J/(mol·K)', 'name': 'Konstanta gas ideal'},
     'N_A': {'value': 6.022e23, 'unit': 'mol⁻¹', 'name': 'Bilangan Avogadro'},
@@ -44,7 +43,7 @@ FORMULAS = {
         'explanation': 'Energi kinetik adalah energi yang dimiliki benda karena geraknya.'
     },
     'potential_energy': {
-        'name': 'Energi Potensial Gravitasi',
+        'name': 'Energi Potensial',
         'category': 'Mekanika',
         'formula': 'E_p = mgh',
         'variables': {'m': 'Massa (kg)', 'h': 'Ketinggian (m)'},
@@ -59,7 +58,7 @@ FORMULAS = {
         'variables': {'F': 'Gaya (N)', 's': 'Jarak (m)'},
         'result': {'var': 'W', 'name': 'Usaha', 'unit': 'J'},
         'calculate': lambda d: d['F'] * d['s'],
-        'explanation': 'Usaha adalah gaya yang bekerja dikali perpindahan dalam arah gaya.'
+        'explanation': 'Usaha adalah gaya yang bekerja dikali perpindahan.'
     },
     'momentum': {
         'name': 'Momentum',
@@ -86,7 +85,7 @@ FORMULAS = {
         'variables': {'I': 'Arus (A)', 'R': 'Hambatan (Ω)'},
         'result': {'var': 'V', 'name': 'Tegangan', 'unit': 'V'},
         'calculate': lambda d: d['I'] * d['R'],
-        'explanation': 'Tegangan listrik pada suatu penghantar sebanding dengan arus dan hambatannya.'
+        'explanation': 'Tegangan listrik sebanding dengan arus dan hambatannya.'
     },
     'electric_power': {
         'name': 'Daya Listrik',
@@ -113,7 +112,7 @@ FORMULAS = {
         'variables': {'R1': 'Hambatan 1 (Ω)', 'R2': 'Hambatan 2 (Ω)'},
         'result': {'var': 'R_total', 'name': 'Hambatan Total', 'unit': 'Ω'},
         'calculate': lambda d: 1 / (1/d['R1'] + 1/d['R2']),
-        'explanation': 'Dalam rangkaian paralel, kebalikan hambatan total sama dengan jumlah kebalikan hambatan.'
+        'explanation': 'Dalam paralel, kebalikan hambatan total = jumlah kebalikan hambatan.'
     },
     'frequency': {
         'name': 'Frekuensi',
@@ -131,7 +130,7 @@ FORMULAS = {
         'variables': {'f': 'Frekuensi (Hz)', 'lambda': 'Panjang gelombang (m)'},
         'result': {'var': 'v', 'name': 'Cepat Rambat', 'unit': 'm/s'},
         'calculate': lambda d: d['f'] * d['lambda'],
-        'explanation': 'Cepat rambat gelombang sama dengan frekuensi dikali panjang gelombang.'
+        'explanation': 'Cepat rambat gelombang = frekuensi × panjang gelombang.'
     },
     'pressure': {
         'name': 'Tekanan',
@@ -140,16 +139,16 @@ FORMULAS = {
         'variables': {'F': 'Gaya (N)', 'A': 'Luas (m²)'},
         'result': {'var': 'P', 'name': 'Tekanan', 'unit': 'Pa'},
         'calculate': lambda d: d['F'] / d['A'],
-        'explanation': 'Tekanan adalah gaya yang bekerja tegak lurus per satuan luas permukaan.'
+        'explanation': 'Tekanan adalah gaya tegak lurus per satuan luas permukaan.'
     },
     'archimedes': {
         'name': 'Hukum Archimedes',
         'category': 'Fluida',
         'formula': 'F_a = ρ × V × g',
-        'variables': {'rho': 'Massa jenis fluida (kg/m³)', 'V': 'Volume benda tercelup (m³)'},
+        'variables': {'rho': 'Massa jenis fluida (kg/m³)', 'V': 'Volume (m³)'},
         'result': {'var': 'F_a', 'name': 'Gaya Apung', 'unit': 'N'},
         'calculate': lambda d: d['rho'] * d['V'] * 9.8,
-        'explanation': 'Gaya apung sama dengan berat fluida yang dipindahkan oleh benda.'
+        'explanation': 'Gaya apung = berat fluida yang dipindahkan oleh benda.'
     },
     'flow_rate': {
         'name': 'Debit',
@@ -174,16 +173,16 @@ FORMULAS = {
         'category': 'Termodinamika',
         'formula': 'PV = nRT',
         'variables': {'P': 'Tekanan (Pa)', 'V': 'Volume (m³)', 'n': 'Mol (mol)', 'T': 'Suhu (K)'},
-        'result': {'var': 'check', 'name': 'Hasil', 'unit': 'J'},
+        'result': {'var': 'check', 'name': 'Selisih PV - nRT', 'unit': 'J'},
         'calculate': lambda d: d['P'] * d['V'] - d['n'] * 8.314 * d['T'],
-        'explanation': 'Persamaan keadaan gas ideal yang menghubungkan tekanan, volume, suhu, dan jumlah mol.'
+        'explanation': 'Persamaan keadaan gas ideal.'
     },
 }
 
 CONVERSIONS = {
     'length': {
         'name': 'Panjang',
-        'units': {'m': 1, 'cm': 0.01, 'mm': 0.001, 'km': 1000, 'inch': 0.0254, 'ft': 0.3048, 'mile': 1609.34, 'yard': 0.9144},
+        'units': {'m': 1, 'cm': 0.01, 'mm': 0.001, 'km': 1000, 'inch': 0.0254, 'ft': 0.3048, 'mile': 1609.34},
         'base': 'm'
     },
     'mass': {
@@ -193,7 +192,7 @@ CONVERSIONS = {
     },
     'time': {
         'name': 'Waktu',
-        'units': {'s': 1, 'min': 60, 'hour': 3600, 'day': 86400, 'week': 604800, 'year': 31536000},
+        'units': {'s': 1, 'min': 60, 'hour': 3600, 'day': 86400, 'week': 604800},
         'base': 's'
     },
     'temperature': {
@@ -213,7 +212,7 @@ CONVERSIONS = {
     },
     'velocity': {
         'name': 'Kecepatan',
-        'units': {'m/s': 1, 'km/h': 0.277778, 'mph': 0.44704, 'knot': 0.514444, 'ft/s': 0.3048},
+        'units': {'m/s': 1, 'km/h': 0.277778, 'mph': 0.44704, 'knot': 0.514444},
         'base': 'm/s'
     },
     'pressure': {
@@ -304,116 +303,97 @@ QUESTIONS = [
 ]
 
 # ==================== HELPER FUNCTIONS ====================
-
 def generate_steps(formula_id, values, result):
     formula = FORMULAS[formula_id]
     steps = []
-    
-    steps.append(f"📐 Rumus yang digunakan: {formula['formula']}")
+    steps.append(f"📐 Rumus: {formula['formula']}")
     steps.append("📝 Diketahui:")
     for var, desc in formula['variables'].items():
         unit = desc.split('(')[-1].strip(')')
         steps.append(f"   • {var} = {values[var]} {unit}")
-    
-    steps.append(f"❓ Ditanya: {formula['result']['name']} ({formula['result']['var']})")
+    steps.append(f"❓ Ditanya: {formula['result']['name']}")
     steps.append("🔢 Penyelesaian:")
     
     if formula_id == 'newton':
-        steps.append(f"   F = m × a = {values['m']} × {values['a']} = {result} N")
+        steps.append(f"   F = m × a = {values['m']} × {values['a']} = {result:.4g} N")
     elif formula_id == 'kinetic_energy':
-        steps.append(f"   E_k = ½ × m × v² = 0.5 × {values['m']} × {values['v']}² = {result} J")
+        steps.append(f"   E_k = ½ × m × v² = 0.5 × {values['m']} × {values['v']}² = {result:.4g} J")
     elif formula_id == 'potential_energy':
-        steps.append(f"   E_p = m × g × h = {values['m']} × 9.8 × {values['h']} = {result} J")
+        steps.append(f"   E_p = m × g × h = {values['m']} × 9.8 × {values['h']} = {result:.4g} J")
     elif formula_id == 'work':
-        steps.append(f"   W = F × s = {values['F']} × {values['s']} = {result} J")
+        steps.append(f"   W = F × s = {values['F']} × {values['s']} = {result:.4g} J")
     elif formula_id == 'momentum':
-        steps.append(f"   p = m × v = {values['m']} × {values['v']} = {result} kg·m/s")
+        steps.append(f"   p = m × v = {values['m']} × {values['v']} = {result:.4g} kg·m/s")
     elif formula_id == 'impulse':
-        steps.append(f"   I = F × Δt = {values['F']} × {values['t']} = {result} N·s")
+        steps.append(f"   I = F × Δt = {values['F']} × {values['t']} = {result:.4g} N·s")
     elif formula_id == 'ohm':
-        steps.append(f"   V = I × R = {values['I']} × {values['R']} = {result} V")
+        steps.append(f"   V = I × R = {values['I']} × {values['R']} = {result:.4g} V")
     elif formula_id == 'electric_power':
-        steps.append(f"   P = V × I = {values['V']} × {values['I']} = {result} W")
+        steps.append(f"   P = V × I = {values['V']} × {values['I']} = {result:.4g} W")
     elif formula_id == 'resistance_series':
-        steps.append(f"   R_total = R₁ + R₂ = {values['R1']} + {values['R2']} = {result} Ω")
+        steps.append(f"   R_total = R₁ + R₂ = {values['R1']} + {values['R2']} = {result:.4g} Ω")
     elif formula_id == 'resistance_parallel':
         r1, r2 = values['R1'], values['R2']
-        steps.append(f"   1/R_total = 1/R₁ + 1/R₂ = 1/{r1} + 1/{r2}")
-        steps.append(f"   1/R_total = {1/r1 + 1/r2:.6f}")
-        steps.append(f"   R_total = 1 / {1/r1 + 1/r2:.6f} = {result:.4f} Ω")
+        steps.append(f"   1/R_total = 1/{r1} + 1/{r2} = {1/r1 + 1/r2:.6f}")
+        steps.append(f"   R_total = 1 / {1/r1 + 1/r2:.6f} = {result:.4g} Ω")
     elif formula_id == 'frequency':
-        steps.append(f"   f = 1/T = 1/{values['T']} = {result:.4f} Hz")
+        steps.append(f"   f = 1/T = 1/{values['T']} = {result:.4g} Hz")
     elif formula_id == 'wave_speed':
-        steps.append(f"   v = f × λ = {values['f']} × {values['lambda']} = {result} m/s")
+        steps.append(f"   v = f × λ = {values['f']} × {values['lambda']} = {result:.4g} m/s")
     elif formula_id == 'pressure':
-        steps.append(f"   P = F/A = {values['F']} / {values['A']} = {result} Pa")
+        steps.append(f"   P = F/A = {values['F']} / {values['A']} = {result:.4g} Pa")
     elif formula_id == 'archimedes':
-        steps.append(f"   F_a = ρ × V × g = {values['rho']} × {values['V']} × 9.8 = {result} N")
+        steps.append(f"   F_a = ρ × V × g = {values['rho']} × {values['V']} × 9.8 = {result:.4g} N")
     elif formula_id == 'flow_rate':
-        steps.append(f"   Q = V/t = {values['V']} / {values['t']} = {result} m³/s")
+        steps.append(f"   Q = V/t = {values['V']} / {values['t']} = {result:.4g} m³/s")
     elif formula_id == 'density':
-        steps.append(f"   ρ = m/V = {values['m']} / {values['V']} = {result} kg/m³")
+        steps.append(f"   ρ = m/V = {values['m']} / {values['V']} = {result:.4g} kg/m³")
     elif formula_id == 'ideal_gas':
         pv = values['P'] * values['V']
         nrt = values['n'] * 8.314 * values['T']
-        steps.append(f"   PV = {values['P']} × {values['V']} = {pv:.2f} Pa·m³")
-        steps.append(f"   nRT = {values['n']} × 8.314 × {values['T']} = {nrt:.2f} J")
-        steps.append(f"   PV - nRT = {pv:.2f} - {nrt:.2f} = {result:.2f}")
-        steps.append(f"   (Jika mendekati 0, gas tersebut mendekati ideal)")
+        steps.append(f"   PV = {values['P']} × {values['V']} = {pv:.2f}")
+        steps.append(f"   nRT = {values['n']} × 8.314 × {values['T']} = {nrt:.2f}")
+        steps.append(f"   Selisih = {pv:.2f} - {nrt:.2f} = {result:.4g}")
     
     steps.append(f"✅ Jadi, {formula['result']['name']} = {result:.6g} {formula['result']['unit']}")
-    
     return steps
 
 def convert_temperature(value, from_unit, to_unit):
-    if from_unit == to_unit:
-        return value
-    if from_unit == 'C':
-        celsius = value
-    elif from_unit == 'F':
-        celsius = (value - 32) * 5/9
-    elif from_unit == 'K':
-        celsius = value - 273.15
-    
-    if to_unit == 'C':
-        return celsius
-    elif to_unit == 'F':
-        return celsius * 9/5 + 32
-    elif to_unit == 'K':
-        return celsius + 273.15
+    if from_unit == to_unit: return value
+    if from_unit == 'C': celsius = value
+    elif from_unit == 'F': celsius = (value - 32) * 5/9
+    elif from_unit == 'K': celsius = value - 273.15
+    if to_unit == 'C': return celsius
+    elif to_unit == 'F': return celsius * 9/5 + 32
+    elif to_unit == 'K': return celsius + 273.15
 
 def parse_ai_query(query):
-    """Simple rule-based AI assistant parser"""
     query = query.lower()
-    
     patterns = [
-        (r'energi\s+kinetik.*?(\d+(?:[.,]\d+)?)\s*kg.*?(\d+(?:[.,]\d+)?)\s*m/s',
+        (r'energi\s+kinetik.*?([0-9]+(?:[.,][0-9]+)?)\s*kg.*?([0-9]+(?:[.,][0-9]+)?)\s*m/s',
          lambda m: {'formula': 'kinetic_energy', 'values': {'m': float(m.group(1).replace(',', '.')), 'v': float(m.group(2).replace(',', '.'))}}),
-        (r'(?:gaya|newton).*?(\d+(?:[.,]\d+)?)\s*kg.*?(\d+(?:[.,]\d+)?)\s*m/s',
+        (r'(?:gaya|newton).*?([0-9]+(?:[.,][0-9]+)?)\s*kg.*?([0-9]+(?:[.,][0-9]+)?)\s*m/s',
          lambda m: {'formula': 'newton', 'values': {'m': float(m.group(1).replace(',', '.')), 'a': float(m.group(2).replace(',', '.'))}}),
-        (r'(?:tegangan|ohm|volt).*?(\d+(?:[.,]\d+)?)\s*A.*?(\d+(?:[.,]\d+)?)\s*ohm',
+        (r'(?:tegangan|ohm|volt).*?([0-9]+(?:[.,][0-9]+)?)\s*A.*?([0-9]+(?:[.,][0-9]+)?)\s*ohm',
          lambda m: {'formula': 'ohm', 'values': {'I': float(m.group(1).replace(',', '.')), 'R': float(m.group(2).replace(',', '.'))}}),
-        (r'energi\s+potensial.*?(\d+(?:[.,]\d+)?)\s*kg.*?(\d+(?:[.,]\d+)?)\s*m',
+        (r'energi\s+potensial.*?([0-9]+(?:[.,][0-9]+)?)\s*kg.*?([0-9]+(?:[.,][0-9]+)?)\s*m',
          lambda m: {'formula': 'potential_energy', 'values': {'m': float(m.group(1).replace(',', '.')), 'h': float(m.group(2).replace(',', '.'))}}),
-        (r'usaha.*?(\d+(?:[.,]\d+)?)\s*N.*?(\d+(?:[.,]\d+)?)\s*m',
+        (r'usaha.*?([0-9]+(?:[.,][0-9]+)?)\s*N.*?([0-9]+(?:[.,][0-9]+)?)\s*m',
          lambda m: {'formula': 'work', 'values': {'F': float(m.group(1).replace(',', '.')), 's': float(m.group(2).replace(',', '.'))}}),
-        (r'momentum.*?(\d+(?:[.,]\d+)?)\s*kg.*?(\d+(?:[.,]\d+)?)\s*m/s',
+        (r'momentum.*?([0-9]+(?:[.,][0-9]+)?)\s*kg.*?([0-9]+(?:[.,][0-9]+)?)\s*m/s',
          lambda m: {'formula': 'momentum', 'values': {'m': float(m.group(1).replace(',', '.')), 'v': float(m.group(2).replace(',', '.'))}}),
-        (r'(?:daya|power).*?(\d+(?:[.,]\d+)?)\s*V.*?(\d+(?:[.,]\d+)?)\s*A',
+        (r'(?:daya|power).*?([0-9]+(?:[.,][0-9]+)?)\s*V.*?([0-9]+(?:[.,][0-9]+)?)\s*A',
          lambda m: {'formula': 'electric_power', 'values': {'V': float(m.group(1).replace(',', '.')), 'I': float(m.group(2).replace(',', '.'))}}),
-        (r'tekanan.*?(\d+(?:[.,]\d+)?)\s*N.*?(\d+(?:[.,]\d+)?)\s*m',
+        (r'tekanan.*?([0-9]+(?:[.,][0-9]+)?)\s*N.*?([0-9]+(?:[.,][0-9]+)?)\s*m',
          lambda m: {'formula': 'pressure', 'values': {'F': float(m.group(1).replace(',', '.')), 'A': float(m.group(2).replace(',', '.'))}}),
     ]
-    
     for pattern, extractor in patterns:
         match = re.search(pattern, query)
         if match:
             return extractor(match)
-    
     return None
 
 # ==================== ROUTES ====================
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -428,17 +408,10 @@ def calculate():
         return jsonify({'error': 'Rumus tidak ditemukan'}), 404
     
     formula = FORMULAS[formula_id]
-    
     try:
-        numeric_values = {}
-        for var in formula['variables']:
-            if var not in values:
-                return jsonify({'error': f'Variabel {var} tidak ditemukan'}), 400
-            numeric_values[var] = float(values[var])
-        
+        numeric_values = {var: float(values[var]) for var in formula['variables']}
         result = formula['calculate'](numeric_values)
         steps = generate_steps(formula_id, numeric_values, result)
-        
         return jsonify({
             'success': True,
             'result': round(result, 10),
@@ -464,14 +437,12 @@ def convert():
         return jsonify({'error': 'Kategori tidak ditemukan'}), 404
     
     conv = CONVERSIONS[category]
-    
     try:
         if category == 'temperature':
             result = convert_temperature(value, from_unit, to_unit)
         else:
             base_value = value * conv['units'][from_unit]
             result = base_value / conv['units'][to_unit]
-        
         return jsonify({
             'success': True,
             'result': round(result, 10),
@@ -500,7 +471,6 @@ def graph():
             ax.set_title(f'Gelombang Sinus: y = {A} sin({omega}t)', fontsize=14, fontweight='bold')
             ax.grid(True, alpha=0.3)
             ax.axhline(y=0, color='k', linewidth=0.5)
-            ax.axvline(x=0, color='k', linewidth=0.5)
             
         elif graph_type == 'free_fall':
             g = 9.8
@@ -508,8 +478,6 @@ def graph():
             t_max = math.sqrt(2 * h0 / g)
             t = np.linspace(0, t_max, 500)
             y = h0 - 0.5 * g * t**2
-            v = g * t
-            
             ax.plot(t, y, 'r-', linewidth=2.5, label='Posisi (m)')
             ax.set_xlabel('Waktu (s)', fontsize=12)
             ax.set_ylabel('Ketinggian (m)', fontsize=12)
@@ -522,7 +490,6 @@ def graph():
             v0 = float(data.get('v0', 0))
             t = np.linspace(0, 10, 500)
             v = v0 + a * t
-            
             ax.plot(t, v, 'g-', linewidth=2.5, label='Kecepatan (m/s)')
             ax.set_xlabel('Waktu (s)', fontsize=12)
             ax.set_ylabel('Kecepatan (m/s)', fontsize=12)
@@ -534,7 +501,6 @@ def graph():
             v = float(data.get('velocity', 5))
             t = np.linspace(0, 10, 500)
             x = v * t
-            
             ax.plot(t, x, 'purple', linewidth=2.5)
             ax.set_xlabel('Waktu (s)', fontsize=12)
             ax.set_ylabel('Posisi (m)', fontsize=12)
@@ -548,7 +514,6 @@ def graph():
             m = float(data.get('mass', 1))
             omega = np.sqrt(k/m)
             y = A * np.cos(omega * t)
-            
             ax.plot(t, y, 'orange', linewidth=2.5)
             ax.set_xlabel('Waktu (s)', fontsize=12)
             ax.set_ylabel('Perpindahan (m)', fontsize=12)
@@ -586,7 +551,6 @@ def check_answer():
         return jsonify({'error': 'Soal tidak ditemukan'}), 404
     
     is_correct = answer == question['answer']
-    
     return jsonify({
         'success': True,
         'correct': is_correct,
